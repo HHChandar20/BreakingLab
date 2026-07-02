@@ -1,0 +1,79 @@
+name: Build and Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.64
+
+      - name: Cache raylib web build
+        uses: actions/cache@v4
+        id: cache-raylib
+        with:
+          path: raylib-web
+          key: raylib-4.5-emsdk-3.1.64
+
+      - name: Build raylib for Web
+        if: steps.cache-raylib.outputs.cache-hit != 'true'
+        run: |
+          wget -q https://github.com/raysan5/raylib/archive/refs/tags/4.5.0.tar.gz
+          tar -xf 4.5.0.tar.gz
+          mkdir -p raylib-4.5.0/build-web
+          cd raylib-4.5.0/build-web
+          emcmake cmake .. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF
+          emmake make -j$(nproc) raylib
+          cd ../..
+          mkdir -p raylib-web/lib raylib-web/include
+          cp raylib-4.5.0/build-web/raylib/libraylib.a raylib-web/lib/
+          cp raylib-4.5.0/src/raylib.h raylib-4.5.0/src/raymath.h raylib-web/include/
+
+      - name: Build game
+        run: |
+          mkdir -p web
+          emcc game/main.cpp game/Game.cpp game/GameManager.cpp \
+            -o web/index.html \
+            -I raylib-web/include \
+            -L raylib-web/lib \
+            -lraylib \
+            -s USE_GLFW=3 \
+            -s GL_ENABLE_GET_PROC_ADDRESS=1 \
+            -s ALLOW_MEMORY_GROWTH=1 \
+            -s TOTAL_MEMORY=134217728 \
+            --preload-file assets \
+            -DPLATFORM_WEB \
+            -Os
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

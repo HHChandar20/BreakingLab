@@ -1,5 +1,16 @@
 #include "Game.hpp"
 
+#ifdef PLATFORM_WEB
+#include <emscripten/emscripten.h>
+EM_JS(int, js_loadHighscore, (), {
+    var val = localStorage.getItem('breakinglab_highscore');
+    return val ? parseInt(val) : 0;
+});
+EM_JS(void, js_saveHighscore, (int score), {
+    localStorage.setItem('breakinglab_highscore', score);
+});
+#endif
+
 Game::Game()
 {
 	//Initialize variables with default values
@@ -32,6 +43,9 @@ Game::Game()
 	highestStreak = 0;
 	slides = -1;
 
+#ifdef PLATFORM_WEB
+	highestStreak = js_loadHighscore();
+#else
 	if (FileExists("highscore.txt"))
 	{
 		highscore.open("highscore.txt", std::ios::in);
@@ -42,6 +56,7 @@ Game::Game()
 		}
 		highscore.close();
 	}
+#endif
 
 	tracks[0] = "lo-fi";
 	tracks[1] = "superhero";
@@ -1305,7 +1320,12 @@ void Game::drawMailbox()
 
 			// Set highest streak
 			if (streak > highestStreak)
+			{
 				highestStreak = streak;
+#ifdef PLATFORM_WEB
+				js_saveHighscore(highestStreak);
+#endif
+			}
 
 			orderElement = rand() % 16 + 6;
 		}

@@ -5,7 +5,10 @@
 class GameManager
 {
 public:
+    GameManager();
     ~GameManager();
     void drawMainLoop();
-    GameManager();
+    void runOneFrame();
+private:
+    Game* game;
 };
