@@ -1,102 +1,100 @@
 <div align="center">
 
-# ⚗️ Breaking Lab
+# Breaking Lab
 
-### *Run a chemistry lab. Fulfill orders. Don't blow it up.*
+**Run the lab. Mix the order. Beat the clock.**
 
-[![Play Online](https://img.shields.io/badge/▶%20Play%20Online-brightgreen?style=for-the-badge)](https://HHChandar20.github.io/BreakingLab/)
-[![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://cplusplus.com)
-[![Raylib](https://img.shields.io/badge/Raylib-black?style=for-the-badge)](https://www.raylib.com)
-[![License](https://img.shields.io/github/license/HHChandar20/BreakingLab?style=for-the-badge)](LICENSE)
+![C++](https://img.shields.io/badge/C%2B%2B-00599c?style=flat-square) ![raylib](https://img.shields.io/badge/raylib-286936?style=flat-square) ![WebAssembly](https://img.shields.io/badge/WebAssembly-654ff0?style=flat-square)
+
+[**Play online →**](https://hhchandar20.github.io/BreakingLab/) · [Gameplay](#gameplay) · [Getting started](#getting-started) · [How it works](#how-it-works)
+
+<img src="docs/screenshots/hero.webp" width="100%" alt="Breaking Lab — real application screenshots in a themed showcase">
 
 </div>
 
----
+## Overview
 
-## 🧪 What is Breaking Lab?
+Breaking Lab is a chemistry-themed time-management game. Collect elements from the shelf, combine them in the reactor, package the requested compound and deliver it to the mailbox. A countdown starts at **2:00**, and successful deliveries build your streak.
 
-You're a chemist running a lab-as-a-business. Orders come in from companies — you have **2 minutes** to synthesize the correct compound and ship it out. Pick the wrong elements and the reactor fires up. Literally.
+The lab is a walkable space with separate workstations, a fire extinguisher, instructions and a music player. A bad reaction can start a fire, turning a routine order into a scramble across the room.
 
-- 🔬 **Combine** elements at the reactor to produce compounds
-- 📦 **Package** the right product and deliver it to the mailbox
-- 🔥 **Extinguish** fires before they ruin your streak
-- 🎵 **Vibe** to a built-in music player while you work
+## Features
 
----
+| Work the order | Keep the lab running |
+| --- | --- |
+| **Element selection and reactor slots** for assembling compounds | **Fire and extinguisher interactions** when a reaction goes wrong |
+| **Packaging and mailbox delivery** as separate steps | **Countdown and delivery streaks** displayed in the HUD |
+| **Order and inventory panels** available while playing | **Music controls** for playback, track selection and repeat |
 
-## 🎮 Controls
+## Gameplay
 
-### Movement
-| Key | Action |
-|-----|--------|
-| `W` `A` `S` `D` | Move character |
+![Recorded Breaking Lab gameplay inside the chemistry laboratory](docs/screenshots/gameplay.webp)
 
-### Interaction
-| Key | Action |
-|-----|--------|
-| `E` | Interact with nearby object |
-| `Tab` | View current order & inventory |
+![Breaking Lab workstations and gameplay screens in a hazard-themed layout](docs/screenshots/screens.webp)
 
-### Reactor
-| Key | Action |
-|-----|--------|
-| `Space` / Left Click | Activate reactor |
-| `R` | Clear reactor slots |
+Real game captures are presented with lab signage and element artwork from the project.
 
-### Packaging
-| Key | Action |
-|-----|--------|
-| `F` | Seal / unseal the package |
-| `R` | Pick up sealed package |
+## Controls
 
-### Music Player
-| Key | Action |
-|-----|--------|
-| `P` | Pause / Resume |
-| `←` `→` | Previous / Next track |
-| `R` | Toggle repeat |
-| `Q` | Random track |
+| Context | Input | Action |
+| --- | --- | --- |
+| Movement | `W` `A` `S` `D` | Walk around the lab |
+| Workstations | `E` | Interact with a nearby station |
+| Extinguisher | Hold `E` while carrying it | Put out a fire |
+| Order / inventory | Hold `Tab` | View the current order and inventory |
+| Reactor | Mouse, `Space`, `R` | Select / place elements, activate the reactor, clear slots |
+| Packaging | `F`, `R` | Seal or unseal; pick up the sealed package |
+| Music player | `P`, `←` / `→`, `R`, `Q` | Pause; change track; toggle repeat; choose a random track |
 
----
+Keys are context-sensitive. The in-game instructions explain the workstations in more detail.
 
-## ▶️ Play in your browser
+## How it works
 
-No installation needed — open it straight in your browser:
+```mermaid
+flowchart LR
+    A[Read the order] --> B[Collect elements]
+    B --> C[Combine in reactor]
+    C --> D[Package the compound]
+    D --> E[Deliver to mailbox]
+    E --> F[Update streak and next order]
+    C --> G[Handle a failed reaction]
+```
 
-**[→ Play Breaking Lab Online](https://HHChandar20.github.io/BreakingLab/)**
+`game/Game.cpp` contains the game state, interactions, rendering and audio. `GameManager.cpp` drives the native loop, while `assets/` contains the laboratory art, compounds, instructions and sound. The browser version uses Emscripten and stores the high score in local storage; the native game uses `highscore.txt`.
 
-> The game runs best on desktop Chrome or Firefox at 1080p. Zoom out (`Ctrl -`) if the canvas doesn't fit your screen.
+## Getting started
 
----
+### Play in the browser
 
-## 📥 Run locally
+Open [Breaking Lab online](https://hhchandar20.github.io/BreakingLab/). Use a desktop browser and keyboard. The game uses a fixed 1920 × 1080 canvas, so browser zoom or fullscreen may help on smaller displays.
+
+### Native Windows project
 
 ```bash
 git clone https://github.com/HHChandar20/BreakingLab.git
+cd BreakingLab
 ```
 
-Then open the solution in **Visual Studio** and build. Requires the bundled raylib (already included in `source/`).
+Open `game.sln` in **Visual Studio 2022** with the **Desktop development with C++** workload and v143 toolset. The raylib headers, library and runtime DLL are included. Use **Debug / x64**; assets and `highscore.txt` are resolved from the repository root.
 
----
+**Build status:** the unmodified solution currently stops at `game/game.rc` because the icon resource points to an absolute path on another machine. Before building locally, update that resource reference to the repository's `breakingLab.ico`. The browser demo is available without that native build step.
 
-## 🛠️ Built with
+## Tech stack
 
-<p>
-  <a href="https://cplusplus.com"><img src="https://cdn-icons-png.flaticon.com/512/6132/6132222.png" width="40" title="C++"/></a>&nbsp;
-  <a href="https://www.raylib.com"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f4/Raylib_logo.png" width="40" title="Raylib"/></a>&nbsp;
-  <a href="https://visualstudio.microsoft.com"><img src="https://1000logos.net/wp-content/uploads/2020/08/Visual-Studio-Logo.png" width="56" title="Visual Studio"/></a>&nbsp;
-  <a href="https://magma.com"><img src="https://framerusercontent.com/images/1LWOMG5A8i1naA9twzi8BpK5dck.png?width=801&height=1131" width="25" title="Magma (art)"/></a>&nbsp;
-  <a href="https://discord.com"><img src="https://www.svgrepo.com/show/353655/discord-icon.svg" width="40" title="Discord"/></a>
-</p>
+C++ · raylib · Visual Studio solution · Emscripten / WebAssembly browser build
 
----
+## Team
 
-## 👥 Team
-
-| Name | Role |
-|------|------|
+| Contributor | Original project role |
+| --- | --- |
 | [Dimitar Vasilev](https://github.com/DSVasilev20) | Scrum Master |
 | [Hakan Chandar](https://github.com/HHChandar20) | Back-end Developer |
 | [Ivan Tsrangalov](https://github.com/IATsrangalov20) | Back-end Developer |
 | [Ivan Chelebiev](https://github.com/IDChelebiev20) | Back-end Developer |
 | [Alexander Baev](https://github.com/AEBaev20) | Designer |
+
+## License
+
+[MIT](LICENSE).
+
+Built by [Hakan Chandar](https://github.com/HHChandar20) · 2023.
